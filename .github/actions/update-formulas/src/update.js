@@ -71,7 +71,7 @@ async function run () {
         core.info(color.cyan(`  Current Revision: ${revision}`))
 
         // Get the latest release of the repository
-        const { data: release } = await octokit.repos.getLatestRelease({ owner, repo })
+        const { data: release } = await octokit.rest.repos.getLatestRelease({ owner, repo })
 
         // Check if the latest release is newer than the current tag/revision
         if (tag === release.tag_name) {
@@ -126,7 +126,7 @@ async function run () {
     // Check if there is already a pull request open from previous runs
     // TODO: take pagination into account
     core.debug('Checking open pull requests ...')
-    const { data: pulls } = await octokit.pulls.list({
+    const { data: pulls } = await octokit.rest.pulls.list({
       owner: config.owner,
       repo: config.repo,
       state: 'open',
@@ -140,7 +140,7 @@ async function run () {
     // Create a new pull request if no pull request is open from previous runs
     if (!pull) {
       core.info(color.yellow('Creating a pull request ...'))
-      pull = (await octokit.pulls.create({
+      pull = (await octokit.rest.pulls.create({
         owner: config.owner,
         repo: config.repo,
         title: config.pullRequestTitle,

@@ -47,14 +47,16 @@ describe('run', () => {
 
   beforeAll(() => {
     mockOctokit = {
-      repos: {
-        get: jest.fn(),
-        listTags: jest.fn(),
-        getLatestRelease: jest.fn()
-      },
-      pulls: {
-        list: jest.fn(),
-        create: jest.fn()
+      rest: {
+        repos: {
+          get: jest.fn(),
+          listTags: jest.fn(),
+          getLatestRelease: jest.fn()
+        },
+        pulls: {
+          list: jest.fn(),
+          create: jest.fn()
+        }
       }
     }
   })
