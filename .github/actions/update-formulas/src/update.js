@@ -83,7 +83,7 @@ async function run () {
         const newTag = release.tag_name
 
         // Fetch the repository tags and get the latest tag
-        const { data: tags } = await octokit.repos.listTags({ owner, repo })
+        const { data: tags } = await octokit.rest.repos.listTags({ owner, repo })
         const { commit: { sha: newRevision } } = tags.find(t => t.name === newTag)
 
         // Update the content of the formula file and write it back to disk
@@ -117,7 +117,7 @@ async function run () {
     await exec.exec('git', ['push', '-f', '-u', config.remoteName, config.branchName])
 
     // Get the default branch of the remote repository
-    const { data: { default_branch: defaultBranch } } = await octokit.repos.get({
+    const { data: { default_branch: defaultBranch } } = await octokit.rest.repos.get({
       owner: config.owner,
       repo: config.repo
     })
