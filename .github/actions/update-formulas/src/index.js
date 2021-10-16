@@ -1,3 +1,3 @@
-const run = require('./update')
+const { run } = require('./update')
 
 run()

@@ -1,52 +1,53 @@
-const fs = require('fs')
+const { readdir, readFile, writeFile } = require('fs/promises')
 
 const _ = require('lodash')
 const core = require('@actions/core')
 const exec = require('@actions/exec')
 const github = require('@actions/github')
 
-const config = require('./config')
 const color = require('./color')
+const { getConfig } = require('./config')
 
+const gpgRegex = /gpg: key ([0-9A-F]{16})/
 const tagRegex = /tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)"/
 const revRegex = /revision:\s+"([0-9a-f]{40})"/
-const urlRegex = /url\s+"(https:\/\/github.com\/([0-9A-Za-z._-]+)\/([0-9A-Za-z._-]+))",\s+tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)",\s+revision:\s+"([0-9a-f]{40})"/g
-
-function isPullRequestOpenedPreviously (pull) {
-  return (
-    _.get(pull, 'title') === config.pullRequestTitle &&
-    _.get(pull, 'user.login') === config.pullRequestUser
-  )
-}
-
-function getPullRequestBody (updatedItems) {
-  let body = `## Description
-
-This pull request is created automatically.
-
-### Updates
-
-`
-
-  for (const item of updatedItems) {
-    body += `  - [x] Update formula **${item.formula}** to **${item.tag}**\n`
-  }
-
-  return body
-}
+const urlRegex = /url\s+"(https:\/\/github.com\/([0-9A-Za-z._-]+)\/([0-9A-Za-z._-]+))",\s+tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)",\s+revision:\s+"([0-9a-f]{40})"/
 
 async function run () {
   try {
-    // Get input variables
-    const token = core.getInput('github_token')
+    // Get configurations
+    const config = await getConfig()
+
+    // Configure git author
+    await exec.exec('git', ['config', 'user.name', config.gitUserName])
+    await exec.exec('git', ['config', 'user.email', config.gitUserEmail])
+
+    // Configure git signing key
+    if (config.gitUserSigningKey) {
+      let cmdOutput = ''
+      const options = {
+        listeners: {
+          stdout: (data) => { cmdOutput += data.toString() }
+        }
+      }
+
+      const keyFile = 'private.key'
+      await writeFile(keyFile, config.gitUserSigningKey)
+      await exec.exec('gpg', ['--import', keyFile], options)
+
+      const [, keyID] = gpgRegex.exec(cmdOutput)
+      await exec.exec('git', ['config', 'user.signingkey', keyID])
+      await exec.exec('git', ['config', 'commit.gpgSign', 'true'])
+      await exec.exec('git', ['config', 'tag.gpgSign', 'true'])
+    }
 
     // Create a GitHub Octokit client
-    const octokit = github.getOctokit(token)
+    const octokit = github.getOctokit(config.githubToken)
 
     const updatedItems = []
 
     // Iterate over all files in the current directory to find *.rb files
-    const files = await fs.promises.readdir('.')
+    const files = await readdir('.')
     for (const file of files) {
       if (file.endsWith('.rb')) {
         const formula = file.split('.').slice(0, -1).join('.')
@@ -54,9 +55,8 @@ async function run () {
         core.info('--------------------------------------------------------------------------------')
         core.info(color.blue(`Formula ${formula} found`))
 
-        let content = await fs.promises.readFile(file, { encoding: 'utf8' })
-        const matches = [...content.matchAll(urlRegex)]
-        let [, url, owner, repo, tag, revision] = matches[0]
+        let content = await readFile(file, { encoding: 'utf8' })
+        let [, url, owner, repo, tag, revision] = urlRegex.exec(content)
 
         // Remove .git from repo name if exists
         if (repo.endsWith('.git')) {
@@ -88,7 +88,7 @@ async function run () {
 
         // Update the content of the formula file and write it back to disk
         content = content.replace(tagRegex, `tag: "${newTag}"`).replace(revRegex, `revision: "${newRevision}"`)
-        await fs.promises.writeFile(file, content)
+        await writeFile(file, content)
         await exec.exec('git', ['add', file])
 
         core.info(color.yellow(`Formula ${formula} updated to tag ${newTag} and revision ${newRevision}`))
@@ -103,10 +103,6 @@ async function run () {
     }
 
     core.info('--------------------------------------------------------------------------------')
-
-    // Configure author
-    await exec.exec('git', ['config', 'user.name', config.gitUserName])
-    await exec.exec('git', ['config', 'user.email', config.gitUserEmail])
 
     // Create a new branch and commit changes
     await exec.exec('git', ['checkout', '-b', config.branchName])
@@ -130,11 +126,16 @@ async function run () {
       owner: config.owner,
       repo: config.repo,
       state: 'open',
-      // TODO: add the filter for head
+      // TODO: add a filter for head
       base: defaultBranch
     })
 
-    let pull = pulls.find(isPullRequestOpenedPreviously)
+    // Find the previously opened pull request
+    let pull = pulls.find((pull) => (
+      _.get(pull, 'title') === config.pullRequestTitle &&
+      _.get(pull, 'user.login') === config.pullRequestUser
+    ))
+
     core.debug(pull ? `Pull request found: ${pull.number}` : 'No open pull request found')
 
     // Create a new pull request if no pull request is open from previous runs
@@ -157,9 +158,27 @@ async function run () {
     core.setOutput('pull_url', pull.html_url)
 
     core.info(color.green(`Pull request: ${pull.html_url}`))
-  } catch (error) {
-    core.setFailed(error.message)
+  } catch (e) {
+    core.setFailed(e.message)
   }
 }
 
-module.exports = run
+function getPullRequestBody (updatedItems) {
+  let body = `## Description
+
+This pull request is created automatically.
+
+### Updates
+
+`
+
+  for (const item of updatedItems) {
+    body += `  - [x] Update formula **${item.formula}** to **${item.tag}**\n`
+  }
+
+  return body
+}
+
+module.exports = {
+  run
+}

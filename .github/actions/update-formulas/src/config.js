@@ -1,29 +1,32 @@
-// Remote repository
-// TODO: get owner and repo automatically
-const OWNER = 'gardenbed'
-const REPO = 'homebrew-brew'
-
-// Git configurations
-const GIT_USER_NAME = 'github-actions[bot]'
-const GIT_USERE_EMAIL = 'github-actions[bot]@users.noreply.github.com'
-
-// Pull request configuration
-const REMOTE_NAME = 'origin'
-const BRANCH_NAME = 'automated-update-formulas'
-const COMMIT_MESSAGE = '[AUTOMATED] Update Formulas'
-const PULL_REQUEST_TITLE = '[AUTOMATED] Update Formulas'
-const PULL_REQUEST_USER = 'github-actions[bot]'
+const core = require('@actions/core')
+const github = require('@actions/github')
 
 module.exports = {
-  owner: OWNER,
-  repo: REPO,
+  getConfig
+}
 
-  gitUserName: GIT_USER_NAME,
-  gitUserEmail: GIT_USERE_EMAIL,
+async function getConfig () {
+  const { owner, repo } = github.context.repo
+  const githubToken = core.getInput('github_token')
+  const gitUserName = core.getInput('git_user_name')
+  const gitUserEmail = core.getInput('git_user_email')
+  const gitUserSigningKey = core.getInput('git_user_signing_key')
 
-  remoteName: REMOTE_NAME,
-  branchName: BRANCH_NAME,
-  commitMessage: COMMIT_MESSAGE,
-  pullRequestTitle: PULL_REQUEST_TITLE,
-  pullRequestUser: PULL_REQUEST_USER
+  return {
+    owner: owner,
+    repo: repo,
+
+    // Git configurations
+    githubToken: githubToken,
+    gitUserName: gitUserName,
+    gitUserEmail: gitUserEmail,
+    gitUserSigningKey: gitUserSigningKey,
+
+    // Pull request configurations
+    remoteName: 'origin',
+    branchName: 'automated-update-formulas',
+    commitMessage: '[AUTOMATED] Update Formulas',
+    pullRequestTitle: '[AUTOMATED] Update Formulas',
+    pullRequestUser: 'github-actions[bot]'
+  }
 }

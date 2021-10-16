@@ -12,6 +12,19 @@ it checks if there is a newer version of formula available and if so, it updates
 The GitHub token provided by `GITHUB_TOKEN` secret.
 For _schedule_ event, this token is not available through github context.
 
+### `git_user_name`
+
+The name of the git user for creating commits.
+
+### `git_user_email`
+
+The email address of the git user for creating commits.
+
+### `git_user_signing_key`
+
+A private GPG key for signing commits, so they show as verified in GitHub.
+This is an optional parameter and if not provided, commits will be unsigned.
+
 ## Outputs
 
 ### `updated`
