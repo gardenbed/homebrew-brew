@@ -7,6 +7,19 @@ inputs:
       The GitHub token provided by GITHUB_TOKEN secret.
       For schedule event, this token is not available through github context.
     required: true
+  git_user_name:
+    description: The name of the git user for creating commits.
+    required: false
+    default: 'github-actions[bot]'
+  git_user_email:
+    description: The email address of the git user for creating commits.
+    required: false
+    default: 'github-actions[bot]@users.noreply.github.com'
+  git_user_signing_key:
+    description: |
+      A private GPG key for signing commits, so they show as verified in GitHub.
+      This is an optional parameter and if not provided, commits will be unsigned.
+    required: false
 outputs:
   updated:
     description: Determines whether or not there has been any formula update.

@@ -14,3 +14,6 @@ jobs:
         uses: ./.github/actions/update-formulas
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_user_name: Milad Irannejad
+          git_user_email: moorara@users.noreply.github.com
+          git_user_signing_key: ${{ secrets.GPG_PRIVATE_KEY }}
