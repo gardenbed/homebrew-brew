@@ -1,10 +1,10 @@
-jest.mock('fs/promises')
 jest.mock('@actions/core')
 jest.mock('@actions/exec')
 jest.mock('@actions/github')
 
+const fs = require('fs')
 const { Buffer } = require('buffer')
-const fsPromises = require('fs/promises')
+
 const core = require('@actions/core')
 const exec = require('@actions/exec')
 const github = require('@actions/github')
@@ -88,7 +88,7 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockRejectedValueOnce(new Error('error on writing key file'))
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('error on writing key file')
@@ -99,7 +99,7 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
       .mockRejectedValueOnce(new Error('error on importing gpg key'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('error on importing gpg key')
@@ -111,7 +111,7 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.email
       .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockRejectedValueOnce(new Error('error on git config user.signingkey'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('error on git config user.signingkey')
@@ -124,7 +124,7 @@ describe('run', () => {
       .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockRejectedValueOnce(new Error('error on git config commit.gpgSign'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('error on git config commit.gpgSign')
@@ -138,7 +138,7 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockRejectedValueOnce(new Error('error on git config tag.gpgSign'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('error on git config tag.gpgSign')
@@ -152,9 +152,9 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockRejectedValueOnce(new Error('cannot read directory'))
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('cannot read directory')
@@ -168,11 +168,11 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockRejectedValueOnce(new Error('cannot read file'))
     await run()
     expect(core.setFailed).toHaveBeenCalledWith('cannot read file')
@@ -186,11 +186,11 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
     github.getOctokit.mockReturnValueOnce({
       rest: {
@@ -212,11 +212,11 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -240,11 +240,11 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
     github.getOctokit.mockReturnValueOnce({
       rest: {
@@ -268,12 +268,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockRejectedValueOnce(new Error('cannot write file'))
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
     github.getOctokit.mockReturnValueOnce({
       rest: {
@@ -298,12 +298,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
       .mockRejectedValueOnce(new Error('error on git add'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
     github.getOctokit.mockReturnValueOnce({
       rest: {
@@ -329,12 +329,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git config tag.gpgSign
       .mockResolvedValueOnce() // git add
       .mockRejectedValueOnce(new Error('error on git checkout'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -364,12 +364,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git add
       .mockResolvedValueOnce() // git checkout
       .mockRejectedValueOnce(new Error('error on git commit'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -400,12 +400,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockRejectedValueOnce(new Error('error on git push'))
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -436,12 +436,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -474,12 +474,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -516,12 +516,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -560,12 +560,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({
@@ -604,12 +604,12 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
-    fsPromises.writeFile
+    fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
-    fsPromises.readdir
+    fs.promises.readdir = jest.fn()
       .mockResolvedValueOnce(files) // read directory
-    fsPromises.readFile
+    fs.promises.readFile = jest.fn()
       .mockResolvedValueOnce(fooContent) // read foo.rb file
       .mockResolvedValueOnce(barContent) // read bar.rb file
     github.getOctokit.mockReturnValueOnce({

@@ -1,4 +1,4 @@
-const { readdir, readFile, writeFile } = require('fs/promises')
+const fs = require('fs')
 
 const _ = require('lodash')
 const core = require('@actions/core')
@@ -32,7 +32,7 @@ async function run () {
       }
 
       const keyFile = 'private.key'
-      await writeFile(keyFile, config.gitUserSigningKey)
+      await fs.promises.writeFile(keyFile, config.gitUserSigningKey)
       await exec.exec('gpg', ['--import', keyFile], options)
 
       const [, keyID] = gpgRegex.exec(cmdOutput)
@@ -47,7 +47,7 @@ async function run () {
     const updatedItems = []
 
     // Iterate over all files in the current directory to find *.rb files
-    const files = await readdir('.')
+    const files = await fs.promises.readdir('.')
     for (const file of files) {
       if (file.endsWith('.rb')) {
         const formula = file.split('.').slice(0, -1).join('.')
@@ -55,7 +55,7 @@ async function run () {
         core.info('--------------------------------------------------------------------------------')
         core.info(color.blue(`Formula ${formula} found`))
 
-        let content = await readFile(file, { encoding: 'utf8' })
+        let content = await fs.promises.readFile(file, { encoding: 'utf8' })
         let [, url, owner, repo, tag, revision] = urlRegex.exec(content)
 
         // Remove .git from repo name if exists
@@ -88,7 +88,7 @@ async function run () {
 
         // Update the content of the formula file and write it back to disk
         content = content.replace(tagRegex, `tag: "${newTag}"`).replace(revRegex, `revision: "${newRevision}"`)
-        await writeFile(file, content)
+        await fs.promises.writeFile(file, content)
         await exec.exec('git', ['add', file])
 
         core.info(color.yellow(`Formula ${formula} updated to tag ${newTag} and revision ${newRevision}`))
