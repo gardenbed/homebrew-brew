@@ -26834,8 +26834,8 @@ const fs = __nccwpck_require__(5747)
 
 const _ = __nccwpck_require__(250)
 const core = __nccwpck_require__(2186)
-const exec = __nccwpck_require__(1514)
 const github = __nccwpck_require__(5438)
+const { exec, getExecOutput } = __nccwpck_require__(1514)
 
 const color = __nccwpck_require__(8197)
 const { getConfig } = __nccwpck_require__(4570)
@@ -26845,35 +26845,32 @@ const tagRegex = /tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)"/
 const revRegex = /revision:\s+"([0-9a-f]{40})"/
 const urlRegex = /url\s+"(https:\/\/github.com\/([0-9A-Za-z._-]+)\/([0-9A-Za-z._-]+))",\s+tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)",\s+revision:\s+"([0-9a-f]{40})"/
 
+async function configure () {
+  // Get configurations
+  const config = await getConfig()
+
+  // Configure git author
+  await exec('git', ['config', 'user.name', config.gitUserName])
+  await exec('git', ['config', 'user.email', config.gitUserEmail])
+
+  // Configure git signing key
+  if (config.gitUserSigningKey) {
+    const keyFile = 'private.key'
+    await fs.promises.writeFile(keyFile, config.gitUserSigningKey)
+    const { stdout } = await getExecOutput('gpg', ['--import', keyFile])
+
+    const [, keyID] = gpgRegex.exec(stdout)
+    await exec('git', ['config', 'user.signingkey', keyID])
+    await exec('git', ['config', 'commit.gpgSign', 'true'])
+    await exec('git', ['config', 'tag.gpgSign', 'true'])
+  }
+
+  return config
+}
+
 async function run () {
   try {
-    // Get configurations
-    const config = await getConfig()
-
-    // Configure git author
-    await exec.exec('git', ['config', 'user.name', config.gitUserName])
-    await exec.exec('git', ['config', 'user.email', config.gitUserEmail])
-
-    // Configure git signing key
-    if (config.gitUserSigningKey) {
-      let cmdOutput = ''
-      const options = {
-        listeners: {
-          stdout: (data) => { cmdOutput += data.toString() }
-        }
-      }
-
-      const keyFile = 'private.key'
-      await fs.promises.writeFile(keyFile, config.gitUserSigningKey)
-      await exec.exec('gpg', ['--import', keyFile], options)
-
-      const [, keyID] = gpgRegex.exec(cmdOutput)
-      await exec.exec('git', ['config', 'user.signingkey', keyID])
-      await exec.exec('git', ['config', 'commit.gpgSign', 'true'])
-      await exec.exec('git', ['config', 'tag.gpgSign', 'true'])
-    }
-
-    // Create a GitHub Octokit client
+    const config = await configure()
     const octokit = github.getOctokit(config.githubToken)
 
     const updatedItems = []
@@ -26921,7 +26918,7 @@ async function run () {
         // Update the content of the formula file and write it back to disk
         content = content.replace(tagRegex, `tag: "${newTag}"`).replace(revRegex, `revision: "${newRevision}"`)
         await fs.promises.writeFile(file, content)
-        await exec.exec('git', ['add', file])
+        await exec('git', ['add', file])
 
         core.info(color.yellow(`Formula ${formula} updated to tag ${newTag} and revision ${newRevision}`))
         updatedItems.push({ formula, tag: newTag, revision: newRevision })
@@ -26937,12 +26934,12 @@ async function run () {
     core.info('--------------------------------------------------------------------------------')
 
     // Create a new branch and commit changes
-    await exec.exec('git', ['checkout', '-b', config.branchName])
-    await exec.exec('git', ['commit', '-m', config.commitMessage])
+    await exec('git', ['checkout', '-b', config.branchName])
+    await exec('git', ['commit', '-m', config.commitMessage])
 
     // Push the branch to the remote repository
     core.info(color.yellow(`Updating remote ${config.branchName} branch ...`))
-    await exec.exec('git', ['push', '-f', '-u', config.remoteName, config.branchName])
+    await exec('git', ['push', '-f', '-u', config.remoteName, config.branchName])
 
     // Get the default branch of the remote repository
     const { data: { default_branch: defaultBranch } } = await octokit.rest.repos.get({

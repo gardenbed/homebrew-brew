@@ -12,7 +12,7 @@ const github = require('@actions/github')
 const { run } = require('./update')
 
 describe('run', () => {
-  let gpgImportData
+  let gpgImportOutput
 
   const files = [
     'foo.rb',
@@ -62,7 +62,7 @@ describe('run', () => {
       repo: 'homebrew-brew'
     }
 
-    gpgImportData = Buffer.from('gpg: key 0123456789ABCDEF: secret key imported')
+    gpgImportOutput = Buffer.from('gpg: key 0123456789ABCDEF: secret key imported')
   })
 
   afterEach(() => {
@@ -98,6 +98,7 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
+    exec.getExecOutput
       .mockRejectedValueOnce(new Error('error on importing gpg key'))
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
@@ -109,8 +110,9 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockRejectedValueOnce(new Error('error on git config user.signingkey'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
@@ -121,9 +123,10 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockRejectedValueOnce(new Error('error on git config commit.gpgSign'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
@@ -134,10 +137,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockRejectedValueOnce(new Error('error on git config tag.gpgSign'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     await run()
@@ -148,10 +152,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     fs.promises.readdir = jest.fn()
@@ -164,10 +169,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     fs.promises.readdir = jest.fn()
@@ -182,10 +188,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     fs.promises.readdir = jest.fn()
@@ -208,10 +215,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     fs.promises.readdir = jest.fn()
@@ -236,10 +244,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
     fs.promises.readdir = jest.fn()
@@ -264,10 +273,11 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockRejectedValueOnce(new Error('cannot write file'))
@@ -293,11 +303,12 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
       .mockRejectedValueOnce(new Error('error on git add'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -323,12 +334,13 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
       .mockResolvedValueOnce() // git add
       .mockRejectedValueOnce(new Error('error on git checkout'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -357,13 +369,14 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
       .mockResolvedValueOnce() // git add
       .mockResolvedValueOnce() // git checkout
       .mockRejectedValueOnce(new Error('error on git commit'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -392,7 +405,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -400,6 +412,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockRejectedValueOnce(new Error('error on git push'))
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -428,7 +442,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -436,6 +449,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -466,7 +481,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -474,6 +488,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -508,7 +524,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -516,6 +531,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -552,7 +569,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -560,6 +576,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
@@ -596,7 +614,6 @@ describe('run', () => {
     exec.exec
       .mockResolvedValueOnce() // git config user.name
       .mockResolvedValueOnce() // git config user.email
-      .mockImplementationOnce((cmd, args, opts) => { opts.listeners.stdout(gpgImportData) }) // gpg --import
       .mockResolvedValueOnce() // git config user.signingkey
       .mockResolvedValueOnce() // git config commit.gpgSign
       .mockResolvedValueOnce() // git config tag.gpgSign
@@ -604,6 +621,8 @@ describe('run', () => {
       .mockResolvedValueOnce() // git checkout
       .mockResolvedValueOnce() // git commit
       .mockResolvedValueOnce() // git push
+    exec.getExecOutput
+      .mockResolvedValueOnce({ stdout: gpgImportOutput }) // gpg --import
     fs.promises.writeFile = jest.fn()
       .mockResolvedValueOnce() // write signing key file
       .mockResolvedValueOnce() // update ruby file
