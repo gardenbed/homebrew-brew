@@ -26857,10 +26857,8 @@ async function configure () {
   if (config.gitUserSigningKey) {
     const keyFile = 'private.key'
     await fs.promises.writeFile(keyFile, config.gitUserSigningKey)
-    const { stdout } = await getExecOutput('gpg', ['--import', keyFile])
+    await getExecOutput('gpg', ['--import', keyFile])
 
-    const [, keyID] = gpgRegex.exec(stdout)
-    await exec('git', ['config', 'user.signingkey', keyID])
     await exec('git', ['config', 'commit.gpgSign', 'true'])
     await exec('git', ['config', 'tag.gpgSign', 'true'])
   }
