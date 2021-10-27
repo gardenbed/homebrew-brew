@@ -1,4 +1,4 @@
-name: Update Action
+name: Verify Action
 on:
   push:
     paths:

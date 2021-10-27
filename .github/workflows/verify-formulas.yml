@@ -1,0 +1,13 @@
+name: Verify Formulas
+on:
+  push:
+    paths:
+      - '**.rb'
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint
+        uses: gardenbed/actions/ruby-lint@main
