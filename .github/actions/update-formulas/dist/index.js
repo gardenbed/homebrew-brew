@@ -26913,7 +26913,7 @@ async function run () {
         const { commit: { sha: newRevision } } = tags.find(t => t.name === newTag)
 
         // Update the content of the formula file and write it back to disk
-        content = content.replace(tagRegex, `tag: "${newTag}"`).replace(revRegex, `revision: "${newRevision}"`)
+        content = content.replace(tagRegex, `tag: '${newTag}'`).replace(revRegex, `revision: '${newRevision}'`)
         await fs.promises.writeFile(file, content)
         await exec('git', ['add', file])
 
