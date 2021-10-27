@@ -19,13 +19,13 @@ describe('run', () => {
     'bar.rb'
   ]
 
-  const fooContent = `url "https://github.com/octocat/foo.git",
-  tag: "v0.1.0",
-  revision: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"`
+  const fooContent = `url 'https://github.com/octocat/foo.git',
+  tag: 'v0.1.0',
+  revision: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'`
 
-  const barContent = `url "https://github.com/octocat/bar.git",
-  tag: "v0.2.0",
-  revision: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"`
+  const barContent = `url 'https://github.com/octocat/bar.git',
+  tag: 'v0.2.0',
+  revision: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'`
 
   const fooNewTag = {
     name: 'v0.1.1',

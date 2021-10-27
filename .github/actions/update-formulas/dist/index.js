@@ -26840,9 +26840,9 @@ const { exec } = __nccwpck_require__(1514)
 const color = __nccwpck_require__(8197)
 const { getConfig } = __nccwpck_require__(4570)
 
-const tagRegex = /tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)"/
-const revRegex = /revision:\s+"([0-9a-f]{40})"/
-const urlRegex = /url\s+"(https:\/\/github.com\/([0-9A-Za-z._-]+)\/([0-9A-Za-z._-]+))",\s+tag:\s+"(v?[0-9]+\.[0-9]+\.[0-9]+)",\s+revision:\s+"([0-9a-f]{40})"/
+const tagRegex = /tag:\s+'(v?[0-9]+\.[0-9]+\.[0-9]+)'/
+const revRegex = /revision:\s+'([0-9a-f]{40})'/
+const urlRegex = /url\s+'(https:\/\/github.com\/([0-9A-Za-z._-]+)\/([0-9A-Za-z._-]+))',\s+tag:\s+'(v?[0-9]+\.[0-9]+\.[0-9]+)',\s+revision:\s+'([0-9a-f]{40})'/
 
 async function configure () {
   // Get configurations

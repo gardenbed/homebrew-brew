@@ -1,4 +1,4 @@
-name: Update Job
+name: Update Formulas
 on:
   schedule:
     # https://crontab.guru

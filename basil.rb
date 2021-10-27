@@ -1,14 +1,15 @@
+# The formula for installing basil binary.
 class Basil < Formula
-  desc "The command-line tool for Basil framework"
-  license "ISC"
-  homepage "https://github.com/gardenbed/basil-cli"
-  url "https://github.com/gardenbed/basil-cli.git",
-    tag: "v0.1.1",
-    revision: "e9e71afc9382f03807042fd2e1bda25bf4f099fb"
-  head "https://github.com/gardenbed/basil-cli.git",
-    branch: "main"
+  desc 'The command-line tool for Basil framework'
+  license 'ISC'
+  homepage 'https://github.com/gardenbed/basil-cli'
+  url 'https://github.com/gardenbed/basil-cli.git',
+      tag: 'v0.1.1',
+      revision: 'e9e71afc9382f03807042fd2e1bda25bf4f099fb'
+  head 'https://github.com/gardenbed/basil-cli.git',
+       branch: 'main'
 
-  depends_on "go" => :build
+  depends_on 'go' => :build
 
   def install
     commit = `git rev-parse --short HEAD`
@@ -19,7 +20,7 @@ class Basil < Formula
     go_version = go_version.strip
     build_time = build_time.strip
 
-    metadata_package = "github.com/gardenbed/basil-cli/metadata"
+    metadata_package = 'github.com/gardenbed/basil-cli/metadata'
     version_flag = "-X \"#{metadata_package}.Version=#{version}\""
     commit_flag = "-X \"#{metadata_package}.Commit=#{commit}\""
     branch_flag = "-X \"#{metadata_package}.Branch=main\""
@@ -28,13 +29,13 @@ class Basil < Formula
     build_time_flag = "-X \"#{metadata_package}.BuildTime=#{build_time}\""
     ldflags = "#{version_flag} #{commit_flag} #{branch_flag} #{go_version_flag} #{build_tool_flag} #{build_time_flag}"
 
-    system "go", "build", "-ldflags", ldflags, "./cmd/basil"
+    system 'go', 'build', '-ldflags', ldflags, './cmd/basil'
 
-    bin.install "basil"
+    bin.install 'basil'
     prefix.install_metafiles
   end
 
   test do
-    system "#{bin}/basil", "-version"
+    system "#{bin}/basil", '-version'
   end
 end
