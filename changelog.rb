@@ -4,8 +4,8 @@ class Changelog < Formula
   license 'ISC'
   homepage 'https://github.com/gardenbed/changelog'
   url 'https://github.com/gardenbed/changelog.git',
-      tag: 'v0.1.4',
-      revision: 'e4e6fd4cbd9df5678bacfb52fc766b3b21edf702'
+      tag: 'v0.1.5',
+      revision: 'd26bbefc5b9d363ccddd2e45424556eec615c8c9'
   head 'https://github.com/gardenbed/changelog.git',
        branch: 'main'
 
