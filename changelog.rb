@@ -13,7 +13,7 @@ class Changelog < Formula
 
   def install
     commit = `git rev-parse --short HEAD`
-    go_version = `go version | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+'`
+    go_version = `go version | grep -E -o '[0-9]+\.[0-9]+(\.[0-9]+)?'`
     build_time = `date '+%Y-%m-%d %T %Z'`
 
     commit = commit.strip
