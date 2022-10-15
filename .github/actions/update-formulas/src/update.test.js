@@ -57,10 +57,12 @@ describe('run', () => {
       .mockReturnValueOnce('jane.doe@example.com')
       .mockReturnValueOnce('-----BEGIN PGP PRIVATE KEY BLOCK----- -----END PGP PRIVATE KEY BLOCK-----')
 
-    github.context.repo = {
-      owner: 'gardenbed',
-      repo: 'homebrew-brew'
-    }
+    Object.defineProperty(github.context, 'repo', {
+      get: jest.fn(() => ({
+        owner: 'gardenbed',
+        repo: 'homebrew-brew'
+      }))
+    })
 
     gpgImportOutput = Buffer.from('gpg: key 0123456789ABCDEF: secret key imported')
   })
