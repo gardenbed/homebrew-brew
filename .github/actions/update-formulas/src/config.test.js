@@ -8,12 +8,10 @@ const { getConfig } = require('./config')
 
 describe('getConfig', () => {
   beforeAll(() => {
-    Object.defineProperty(github.context, 'repo', {
-      get: jest.fn(() => ({
-        owner: 'gardenbed',
-        repo: 'homebrew-brew'
-      }))
-    })
+    github.context.repo = {
+      owner: 'gardenbed',
+      repo: 'homebrew-brew'
+    }
   })
 
   test('input parameters are not provided', async () => {
