@@ -4,8 +4,8 @@ class Basil < Formula
   license 'ISC'
   homepage 'https://github.com/gardenbed/basil-cli'
   url 'https://github.com/gardenbed/basil-cli.git',
-      tag: 'v0.2.6',
-      revision: 'a0212e7c5ece0f34de954857d7dcf205b04ce2a9'
+      tag: 'v0.2.7',
+      revision: 'b1fb039c2d8acff40d8f7454d63c1e4ba451889c'
   head 'https://github.com/gardenbed/basil-cli.git',
        branch: 'main'
 
