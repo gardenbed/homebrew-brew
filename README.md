@@ -1,3 +1,3 @@
 # homebrew-brew
 
-The [Homebrew](https://brew.sh) tap for GardenBed.
+The [Homebrew](https://brew.sh) tap for Gardenbed.
