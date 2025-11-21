@@ -4,8 +4,8 @@ class Emerge < Formula
   license 'ISC'
   homepage 'https://github.com/gardenbed/emerge'
   url 'https://github.com/gardenbed/emerge.git',
-      tag: 'v0.1.0',
-      revision: '7794e982f89fa6e0ac9ecb03f9de5bbb7ce9ad54'
+      tag: 'v0.2.0',
+      revision: 'fccd6aaf6d87ad561db04fff58e40dab3c8871c5'
   head 'https://github.com/gardenbed/emerge.git',
        branch: 'main'
 
